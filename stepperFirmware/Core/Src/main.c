@@ -185,8 +185,8 @@ int main(void)
   stepper.showButtons = 1;
   // developing code only
   stepper.record = 0;
-//  int storedRecord = rememberRecordEEPROM();
-//  stepper.record = storedRecord;
+  int storedRecord = rememberRecordEEPROM();
+  stepper.record = storedRecord;
   initialiseStepDetector();
 
   // check for calibrated data

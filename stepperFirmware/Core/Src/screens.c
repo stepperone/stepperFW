@@ -75,6 +75,9 @@ void homescreen()
     Paint_DrawString_EN(50, 185, hString, &Font_logo2, WHITE, BLACK);
 
     char rbuffer[12]; // good up to 10-digit int + sign + '\0'
+    if (stepper.record < stepper.steps) {
+    	stepper.record = stepper.steps;
+    }
     snprintf(rbuffer, sizeof(rbuffer), "%d", stepper.record);
     char *rString = rbuffer;
 
@@ -281,15 +284,13 @@ void manageDisp()
                 EPD_2IN66_Display(dispCanvas);
                 EPD_2IN66_Init_Partial();
                 partialRefreshCount = 0;
-//                updateStatisticsEE();
-//                rememberRecordEEPROM();
+                updateRecordEE();
             }
             else
             {
                 printf("////PARTIAL REFRESH////\r\n");
                 EPD_2IN66_Display(dispCanvas);
                 partialRefreshCount++;
-//                doubleBlink();
             }
             copyState(&lastState);
         }

@@ -39,7 +39,6 @@ int getBatteryState(void) {
 	    }
 }
 
-
 void outputBatteryLevel(){
 	static uint32_t lastSampleTime = 0;
 
@@ -78,36 +77,18 @@ void resetEEPROMVariables() {
 
 }
 
-
 void updateRecordEE()
 { // this function updates the statistics in EEprom
-
-	eepromHeader();
-	uint32_t val = stepper.record;
-	EE_Status ee_status = EE_WriteVariable32bits(2, val);
-	eepromFooter(ee_status);
-}
-
-void writeTest() {
-	eepromHeader();
-	uint32_t val = 633;
-	EE_Status ee_status = EE_WriteVariable32bits(1, val);
-	eepromFooter(ee_status);
-}
-
-void updateOdoEE(){
-}
-
-void rememberOdoEEPROM(){
-
-}
-
-uint32_t readTest() {
-	uint32_t record;
-	EE_Status ee_status;
-	ee_status = EE_ReadVariable32bits(1, &a_VarDataTab[1]);
-	record = a_VarDataTab[1];
-	return record;
+#ifndef eeprom
+	uint32_t record = rememberRecordEEPROM();
+	if (record < stepper.record) {
+		eepromHeader();
+		uint32_t val = stepper.record;
+		EE_Status ee_status = EE_WriteVariable32bits(2, val);
+		eepromFooter(ee_status);
+	}
+#else
+#endif
 }
 
 uint32_t rememberRecordEEPROM() {

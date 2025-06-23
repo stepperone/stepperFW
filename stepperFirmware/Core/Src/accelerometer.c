@@ -87,7 +87,6 @@ static ADC_HandleTypeDef *hadc = &hadc1;
      stepTimestamps[stepIndex] = now;
      stepIndex = (stepIndex + 1) % MAX_STEPS;
      stepper.steps++;
-     stepper.record++;
      stepper.hour++;
 
      step_detector.last_step_time = now;
@@ -169,7 +168,7 @@ uint32_t lastAccelTime = 0;    // ms
 bool validAccelDetected = false;
 
 void observeSensor(void) {
-                                                         float xAccel = convert_adc_to_gharrsha(readADCharrsha(Xchannel), offsetX, sensitivityX);
+	float xAccel = convert_adc_to_gharrsha(readADCharrsha(Xchannel), offsetX, sensitivityX);
     float yAccel = convert_adc_to_gharrsha(readADCharrsha(Ychannel), offsetY, sensitivityY);
     float zAccel = convert_adc_to_gharrsha(readADCharrsha(Zchannel), offsetZ, sensitivityZ);
     float accelMagnitude = sqrtf(xAccel*xAccel + yAccel*yAccel + zAccel*zAccel);
