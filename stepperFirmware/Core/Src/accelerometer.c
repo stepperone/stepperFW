@@ -12,7 +12,7 @@ extern float neg;
 extern ADC_HandleTypeDef hadc1; // Declare if needed
 static ADC_HandleTypeDef *hadc = &hadc1;
 
-float sensitivityX = 1, sensitivityY = 1, sensitivityZ = 1;
+
 //extern float offsetX = 0;
 //extern float offsetY = 0;
 //extern float offsetZ = 0;
@@ -169,7 +169,7 @@ uint32_t lastAccelTime = 0;    // ms
 bool validAccelDetected = false;
 
 void observeSensor(void) {
-    float xAccel = convert_adc_to_gharrsha(readADCharrsha(Xchannel), offsetX, sensitivityX);
+                                                         float xAccel = convert_adc_to_gharrsha(readADCharrsha(Xchannel), offsetX, sensitivityX);
     float yAccel = convert_adc_to_gharrsha(readADCharrsha(Ychannel), offsetY, sensitivityY);
     float zAccel = convert_adc_to_gharrsha(readADCharrsha(Zchannel), offsetZ, sensitivityZ);
     float accelMagnitude = sqrtf(xAccel*xAccel + yAccel*yAccel + zAccel*zAccel);
@@ -328,7 +328,7 @@ void observeSensor(void) {
 	manageDisp();
 	calibrateAxis(Xchannel, &offsetX, &sensitivityX, "X");
 
-//	writeCaliEE(&offsetX, &offsetY, &offsetZ);
+	writeCaliEE(&offsetX, &offsetY, &offsetZ, &sensitivityX, &sensitivityY, &sensitivityZ);
 
 	stepper.screen = HOMESCREEN;
 	manageDisp();
@@ -421,7 +421,7 @@ void observeSensor(void) {
                  tempP = readADCharrsha(channel);  // +axis
                  pos = tempP;
                  calibStage++;
-//                 doubleBlink();
+                 fastDoubleBlink();
              }
          }
          else if (calibStage == 1) {
@@ -430,7 +430,7 @@ void observeSensor(void) {
                  tempN = readADCharrsha(channel);  // -axis
                  neg = tempN;
                  calibStage++;
-//                 doubleBlink();
+                 fastDoubleBlink();
              }
          }
          else if (calibStage == 2) {

@@ -38,7 +38,7 @@ extern "C" {
 #include "user.h"
 #include "DEV_Config.h"
 #include "screens.h"
-
+#include "eeprom_emul.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -156,6 +156,9 @@ typedef struct
 	float xOffset;
 	float yOffset;
 	float zOffset;
+	float xSensitivity;
+	float ySensitivity;
+	float zSensitivity;
 } cali3D;
 
 struct stepperStruct

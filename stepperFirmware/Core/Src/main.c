@@ -31,6 +31,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+//#define eeprom // for i2c eeprom
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -40,6 +42,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+
+CRC_HandleTypeDef hcrc;
 
 SPI_HandleTypeDef hspi1;
 
@@ -59,6 +63,10 @@ float offsetX;
 float offsetY;
 float offsetZ;
 
+float sensitivityX;
+float sensitivityY;
+float sensitivityZ;
+
 uint16_t adc_value;
 uint16_t vrefint_value;
 float voltage_actual;
@@ -77,6 +85,7 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -110,7 +119,11 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+#ifndef eeprom
+  // Set up interrupts for eeprom emulation
+  HAL_NVIC_SetPriority(PVD_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(PVD_IRQn);
+#endif
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -118,11 +131,42 @@ int main(void)
   MX_ADC1_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
+  MX_CRC_Init();
   /* USER CODE BEGIN 2 */
+
+#ifndef eeprom
+	// Unlock Flash for EEPROM init
+	if (HAL_FLASH_Unlock() != HAL_OK) {
+		HAL_FLASH_Lock();
+		Error_Handler();
+	}
+
+	// Enable PWR clock FIRST
+	__HAL_RCC_PWR_CLK_ENABLE();
+
+	// Configure PVD AFTER clock enable
+	HAL_NVIC_SetPriority(PVD_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(PVD_IRQn);
+
+	PWR_PVDTypeDef sConfigPVD = {.PVDLevel = PWR_PVDLEVEL_6, .Mode = PWR_PVD_MODE_IT_RISING};
+	if (HAL_PWR_ConfigPVD(&sConfigPVD) != HAL_OK) Error_Handler();
+	HAL_PWR_EnablePVD();
+
+	__HAL_FLASH_ENABLE_IT(FLASH_IT_ECCC);
+
+	// Initialize EEPROM
+	EE_Status status = EE_Init(EE_CONDITIONAL_ERASE);
+	if (status != EE_OK) {
+		HAL_FLASH_Lock();
+		Error_Handler();
+	}
+
+	HAL_Delay(100);
+
+	HAL_FLASH_Lock();  // Lock Flash after init
+#endif
+
   singleBlink();
-
-  testButtons();
-
   initStruct();
   setupDisp();
 
@@ -130,43 +174,53 @@ int main(void)
   {
   	stepper.screen = SYS_ERROR;
   	manageDisp();
-		ledManager();
+	ledManager();
   }
 
   stepper.pace = IDLE;
   uint32_t now = HAL_GetTick();
-  stepper.lastStepTime = now;
+  stepper.lastStepTime = 0;
   stepper.steps = 0;
   stepper.lastButtonPress = now;
-  stepper.screen = HOMESCREEN;
   stepper.showButtons = 1;
   // developing code only
   stepper.record = 0;
-  HAL_Delay(100);
 //  int storedRecord = rememberRecordEEPROM();
 //  stepper.record = storedRecord;
-//  manageDisp();
   initialiseStepDetector();
-//
-//  // check for calibrated data
-//  // if not:
-//  stepper.screen = CALIBRATION;
+
+  // check for calibrated data
+  cali3D caliStruct;
+  readCaliEE(&caliStruct);
+  float averageOffset = (caliStruct.xOffset + caliStruct.yOffset + caliStruct.zOffset)/3;
+  float averageSensitivity = (caliStruct.xSensitivity + caliStruct.ySensitivity + caliStruct.zSensitivity)/3;
+  if ((averageOffset > 1500)&&(averageOffset < 2500)&&(averageSensitivity > 300)&&(averageSensitivity < 600)) {
+	  stepper.screen = HOMESCREEN;
+	  offsetX = caliStruct.xOffset;
+	  sensitivityX = caliStruct.xSensitivity;
+	  offsetY = caliStruct.yOffset;
+	  sensitivityY = caliStruct.ySensitivity;
+	  offsetZ = caliStruct.zOffset;
+	  sensitivityZ = caliStruct.zSensitivity;
+  } else {
+	  stepper.screen = CALIBRATION;
+  }
+  manageDisp();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	if (stepper.screen == CALIBRATION) {
-//		calibrateAllAxes(); // ORDER IS --> X, Y, Z
-//	}
+	if (stepper.screen == CALIBRATION) {
+		calibrateAllAxes(); // ORDER IS --> X, Y, Z
+	}
 
-//	observeSensor();
-//	paceDetection();
+	observeSensor();
+	paceDetection();
 	ledManager();
 	manageDisp();
 
@@ -273,6 +327,37 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief CRC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CRC_Init(void)
+{
+
+  /* USER CODE BEGIN CRC_Init 0 */
+
+  /* USER CODE END CRC_Init 0 */
+
+  /* USER CODE BEGIN CRC_Init 1 */
+
+  /* USER CODE END CRC_Init 1 */
+  hcrc.Instance = CRC;
+  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
+  hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
+  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
+  hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
+  hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
+  if (HAL_CRC_Init(&hcrc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN CRC_Init 2 */
+
+  /* USER CODE END CRC_Init 2 */
 
 }
 
@@ -466,6 +551,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+		stepper.screen = SYS_ERROR;
+		manageDisp();
+		ledManager();
   }
   /* USER CODE END Error_Handler_Debug */
 }
