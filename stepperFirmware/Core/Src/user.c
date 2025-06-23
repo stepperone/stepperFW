@@ -21,6 +21,7 @@ void inputActioner(){
         	// reset all time steps
         	stepper.screen = HOMESCREEN;
         	stepper.record = 0;
+        	resetRecordEE();
         } else if (stepper.screen == SYS_RESET && isButtonPressed(2)) {
         	// reset current steps? Or hour steps if we get that working
         	stepper.screen = HOMESCREEN;

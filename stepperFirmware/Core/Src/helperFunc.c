@@ -91,6 +91,17 @@ void updateRecordEE()
 #endif
 }
 
+void resetRecordEE()
+{ // this function updates the statistics in EEprom
+#ifndef eeprom
+	eepromHeader();
+	uint32_t val = 0;
+	EE_Status ee_status = EE_WriteVariable32bits(2, val);
+	eepromFooter(ee_status);
+#else
+#endif
+}
+
 uint32_t rememberRecordEEPROM() {
 #ifndef eeprom
 	uint32_t record;
