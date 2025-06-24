@@ -117,7 +117,7 @@ void Error_Handler(void);
 #define Zchannel ADC_CHANNEL_9
 #define BATTMONchannel ADC_CHANNEL_0
 
-
+#define eeprom // for i2c eeprom
 // states the system can be in (mainly for the display)
 typedef enum
 {
