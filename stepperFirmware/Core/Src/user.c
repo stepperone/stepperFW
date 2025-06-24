@@ -7,17 +7,17 @@
 
 void inputActioner(){
     if (stepper.pace == IDLE){
-        if (stepper.screen == HOMESCREEN && stepper.showButtons && isButtonPressed(2)){
+        if (stepper.screen == HOMESCREEN && stepper.showButtons && isButtonPressed(1)){
         	// go to reset screen where stats can be selectively reset
             stepper.screen = SYS_RESET;
-        } else if (stepper.screen == HOMESCREEN && stepper.showButtons && isButtonPressed(1)) {
+        } else if (stepper.screen == HOMESCREEN && stepper.showButtons && isButtonPressed(2)) {
         	// calibrate
         	stepper.screen = CALIBRATION;
         	calibrateAllAxes();
         } else if (stepper.screen == SYS_ERROR && isButtonPressed(3)) {
         	// retry due to error
         	stepper.screen = HOMESCREEN;
-        } else if (stepper.screen == SYS_RESET && isButtonPressed(1)) {
+        } else if (stepper.screen == SYS_RESET && isButtonPressed(3)) {
         	// reset all time steps
         	stepper.screen = HOMESCREEN;
         	stepper.record = 0;
@@ -25,8 +25,8 @@ void inputActioner(){
         } else if (stepper.screen == SYS_RESET && isButtonPressed(2)) {
         	// reset current steps? Or hour steps if we get that working
         	stepper.screen = HOMESCREEN;
-        	stepper.hour - 0;
-        } else if (stepper.screen == SYS_RESET && isButtonPressed(3)) {
+        	stepper.hour = 0;
+        } else if (stepper.screen == SYS_RESET && isButtonPressed(1)) {
         	// Go back
         	stepper.screen = HOMESCREEN;
         }
