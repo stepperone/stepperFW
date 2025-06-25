@@ -17,16 +17,16 @@ void inputActioner(){
         } else if (stepper.screen == SYS_ERROR && isButtonPressed(3)) {
         	// retry due to error
         	stepper.screen = HOMESCREEN;
-        } else if (stepper.screen == SYS_RESET && isButtonPressed(3)) {
+        } else if (stepper.screen == SYS_RESET && isButtonPressed(1)) {
         	// reset all time steps
         	stepper.screen = HOMESCREEN;
         	stepper.record = 0;
         	resetRecordEE();
-        } else if (stepper.screen == SYS_RESET && isButtonPressed(2)) {
+        } else if (stepper.screen == SYS_RESET && isButtonPressed(0)) {
         	// reset current steps? Or hour steps if we get that working
         	stepper.screen = HOMESCREEN;
         	stepper.hour = 0;
-        } else if (stepper.screen == SYS_RESET && isButtonPressed(1)) {
+        } else if (stepper.screen == SYS_RESET && isButtonPressed(2)) {
         	// Go back
         	stepper.screen = HOMESCREEN;
         }

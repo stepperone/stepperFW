@@ -89,10 +89,10 @@ void homescreen()
     {
 //        Draw_CenteredText(25, getBatteryState(), &Font_counter, WHITE, BLACK);
         Paint_SetRotate(270);
-        Paint_DrawBitMap_Paste(triangle, 140, 130, 8, 5, BLACK);
-        Paint_DrawString_EN(100, 135, "Calibration", &Font_label, WHITE, BLACK);
-        Paint_DrawBitMap_Paste(triangle, 31, 130, 8, 5, BLACK);
-        Paint_DrawString_EN(16, 135, "Reset", &Font_label, WHITE, BLACK);
+        Paint_DrawBitMap_Paste(triangle, 60, 130, 8, 5, BLACK);
+        Paint_DrawString_EN(30, 135, "Calibration", &Font_label, WHITE, BLACK);
+        Paint_DrawBitMap_Paste(triangle, 273, 130, 8, 5, BLACK);
+        Paint_DrawString_EN(255, 135, "Reset", &Font_label, WHITE, BLACK);
     }
     Paint_SetRotate(0);
 }
@@ -146,13 +146,12 @@ void reset()
     Draw_CenteredText(105, "steps", &Font_title, WHITE, BLACK);
 
     Paint_SetRotate(270);
-    Paint_DrawBitMap_Paste(triangle, 155, 130, 8, 5, BLACK);
-    Paint_DrawString_EN(140, 135, "Record", &Font_label, WHITE, BLACK); //this one
-    Paint_DrawBitMap_Paste(triangle, 70, 130, 8, 5, BLACK);
-    Paint_DrawString_EN(65, 135, "Hour", &Font_label, WHITE, BLACK); //this one
-    Paint_DrawBitMap_Paste(triangle, 20, 130, 8, 5, BLACK);
-    Paint_DrawString_EN(10, 135, "Back", &Font_label, WHITE, BLACK);
-
+    Paint_DrawBitMap_Paste(triangle, 273, 130, 8, 5, BLACK);
+    Paint_DrawString_EN(270, 135, "Rec", &Font_label, WHITE, BLACK); //this one
+    Paint_DrawBitMap_Paste(triangle, 220, 130, 8, 5, BLACK);
+    Paint_DrawString_EN(218, 135, "Hr", &Font_label, WHITE, BLACK); //this one
+    Paint_DrawBitMap_Paste(triangle, 60, 130, 8, 5, BLACK);
+    Paint_DrawString_EN(55, 135, "Back", &Font_label, WHITE, BLACK);
 //    Paint_SetRotate(0);
 //    drawLogo(LOGO_HEIGHT);
 }
